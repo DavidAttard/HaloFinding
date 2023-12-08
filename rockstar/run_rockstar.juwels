@@ -1,0 +1,40 @@
+#!/bin/bash
+
+#SBATCH -A hestiaeor
+#SBATCH --job-name="rockstar"
+#SBATCH --time=02:00:00
+#SBATCH --nodes=8
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=48
+#SBATCH --mem=0
+# #SBATCH --partition=mem192
+#SBATCH --partition=batch
+#SBATCH --output=/p/scratch/hestiaeor/david/log_rockstar/%x.%j.o
+#SBATCH --error=/p/scratch/hestiaeor/david/log_rockstar/%x.%j.e
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=da500@sussex.ac.uk
+#SBATCH --array=00-127
+#======START=====
+#module load defaults/GPU
+
+module load Stages/2024
+module load GCC/12.3.0
+module load ParaStationMPI/5.9.2-1
+module load HDF5
+
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+printf -v out "%03g" $SLURM_ARRAY_TASK_ID
+
+workdir=/p/scratch/hestiaeor/david/halo_finding_rockstar/rockstar/$out
+exe=/p/scratch/hestiaeor/david/rockstar-galaxies/rockstar-galaxies
+
+# Enter working directory
+echo Current directory $(pwd)
+
+# Start the server
+# $exe -c /p/scratch/hestiaeor/david/halo_finding_rockstar/rockstar/$out/parallel.cfg >& /p/scratch/hestiaeor/david/halo_finding_rockstar/rockstar/$out/server.dat &
+$exe -c /p/scratch/hestiaeor/david/halo_finding_rockstar/rockstar/$out/parallel.cfg > /p/scratch/hestiaeor/david/halo_finding_rockstar/rockstar/$out/server.dat 2>&1 &
+
+perl -e "sleep 1 while (!(-e '/p/scratch/hestiaeor/david/halo_finding_rockstar/rockstar/$out/auto-rockstar.cfg'))"
+
+srun $exe -c /p/scratch/hestiaeor/david/halo_finding_rockstar/rockstar/$out/auto-rockstar.cfg
