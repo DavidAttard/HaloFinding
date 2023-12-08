@@ -1,5 +1,7 @@
 # run the following code using the command: mpirun -n 4 python ~/runRockstar.py
 
+# NOTE: Do NOT use this code if submitting via job scripts and using multiple nodes!!
+
 import sys, os, time
 from subprocess import call
 from mpi4py import MPI
