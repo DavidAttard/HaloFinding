@@ -1,0 +1,32 @@
+#!/bin/bash
+
+#SBATCH -A hestiaeor
+#SBATCH --job-name="ahf"
+#SBATCH --time=00:15:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=0
+#SBATCH --partition=batch
+#SBATCH --output=/p/project/hestiaeor/david/hestiaeor/MergerTree_4096/log_mergerTree/%x.%j.o
+#SBATCH --error=/p/project/hestiaeor/david/hestiaeor/MergerTree_4096/log_mergerTree/%x.%j.e
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=da500@sussex.ac.uk
+#SBATCH --array=1-127
+#======START=====
+#module load defaults/GPU
+module load Stages/2024
+module load GCC/12.3.0
+
+
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+
+
+printf -v out "%03g" $SLURM_ARRAY_TASK_ID
+
+cd /p/project/hestiaeor/david/hestiaeor/MergerTree_4096/Trees/$out
+
+
+# -K kills the job if a process returns a non-zero exit code
+bash ./mergerTree_code.sh
+#=====END====
