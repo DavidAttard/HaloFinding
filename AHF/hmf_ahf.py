@@ -59,24 +59,24 @@ def haloMFAHF_cleanRegion(halodata_ahf):
         dn = np.append(dn, len(halos_ahf[ (halos_ahf['Mhalo(4)']>log_bins[i]) & (halos_ahf['Mhalo(4)']<=log_bins[i+1]) ]['Mhalo(4)']))
         dm = np.append(dm, log_bins[i+1]-log_bins[i])
 
-    dndm = dn/dlm 
-    
+    dndm = dn/dlm #np.log(dm)
     hmf_ahf = dndm / (100**3)
-
+    # hmf_ahf = dndm / (0.25**3)
     log10M = (log_bins[1:] + log_bins[:-1]) / 2
 
     return hmf_ahf, log10M, n_50_mass
 
-base_directory_1 = "/p/project/hestiaeor/david/hestiaeor/AHF/"
+base_directory_1 = "/cosma7/data/dp004/dc-atta2/AHF_16384/"
 # base_directory_2 = "/p/scratch/hestiaeor/david/AHF_4096_unbound/"
 
 snap_template = "{:03d}"  # Use 3 digits, e.g., 001, 002, ..., 127
 file_suffix = "_halos"
 
-for snap_number in range(128):
+for snap_number in range(59):
     # Construct the directory path
-    directory_path_1 = f"{base_directory_1}{snap_number:03d}/halos/"
-53!    
+    directory_path_1 = "{}{:03d}/halos/".format(base_directory_1, snap_number)
+    # directory_path_2 = f"{base_directory_2}{snap_number:03d}/halos/"
+    
     # Check if the directory exists
     if os.path.exists(directory_path_1):
         # List files in the directory ending with "_halos"
@@ -159,13 +159,26 @@ for snap_number in range(128):
             ax1.plot(mass_func_m, mass_func, c="black", label="Watson")
             ax1.plot(mass_func_m_2, mass_func_2, c="green", label="Tinker 10")
 
+            non_zero_values = [value for value in y2 if value != 0]
+
+            if non_zero_values:
+                # Find the minimum value excluding zero
+                min_value_excluding_zero = min(value for value in y2 if value != 0)
+                max_value_excluding_zero = max(value for value in y2 if value != 0)
+
+            
+                # Set y-axis limits excluding zero
+                ax1.set_ylim(min_value_excluding_zero * 10**(-2), max_value_excluding_zero * 10**(6))
+
             ax1.axvline(x = 64219029.925021565)
             ax1.set_xscale("log")
             ax1.set_yscale("log")
+            
+
             ax1.legend()
             ax1.set_title('z = {}'.format(z))
             # ax1.set_xlabel(r"(M)[$M_{\odot}$]")
-            ax1.set_ylabel(r"$\frac{dn}{d\log{M}}$ [$\mathrm{h}^3 \, \mathrm{Mpc}^{-3}$]")
+            ax1.set_ylabel(r"$\frac{dn}{d\log{M}}$ [$\mathrm{h}^3 \, \mathrm{M}_{\odot}^{-1} \, \mathrm{Mpc}^{-3}$]")
 
             ratio_1 = y1/  mass_func
             # ratio_2 = y2/  mass_func
@@ -186,6 +199,8 @@ for snap_number in range(128):
             ax2.set_ylabel('Ratio')
             ax2.set_ylim(0, 1.5)
             plt.tight_layout()
-            fig.savefig('/p/project/hestiaeor/david/hestiaeor/AHF_hmf_test/hmf_z_{}.jpg'.format(z))
+            fig.savefig('/cosma7/data/dp004/dc-atta2/AHF_hmf/hmf_z_{}.jpg'.format(z))
+
+
 
 
