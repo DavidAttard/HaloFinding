@@ -11,7 +11,7 @@ base_directory_1 = '/p/scratch/hestiaeor/david/AHF_RT_256_4096_CRAL_MF_PAD_LMAX1
 
 start_snap = 51
 end_snap = 1
-with open('scales.txt', 'w') as f:
+with open('DescScales.txt', 'w') as f:
     for snap_number in range(end_snap, start_snap+1):
 
         file_suffix = "_halos"
